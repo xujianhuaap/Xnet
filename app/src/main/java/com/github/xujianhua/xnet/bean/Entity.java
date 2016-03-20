@@ -16,7 +16,7 @@ public class Entity {
      * @return jsonStr
      */
 
-    public static String toJson( HttpResponse httpResponse){
+    public static String getJson( HttpResponse httpResponse){
         if(httpResponse.getContentType().startsWith("text/")){
             if(httpResponse!=null){
                 byte[] bytes= httpResponse.getDatas();
@@ -31,4 +31,6 @@ public class Entity {
         }
         return null;
     }
+
+
 }
