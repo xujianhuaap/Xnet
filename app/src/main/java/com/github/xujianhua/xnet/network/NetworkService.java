@@ -19,7 +19,7 @@ public class NetworkService {
      */
     public static <T> T getService(Class<T> clazz){
         isValidateService(clazz);
-        T t= (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, new XnetHandler());
+        T t= (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, new XnetHandler(clazz));
         return t;
     }
 
@@ -37,12 +37,18 @@ public class NetworkService {
     /***
      * 网络请求的方法
      */
-    public static class XnetHandler implements InvocationHandler{
+    public static class XnetHandler<T> implements InvocationHandler{
+        private Class<T> clazz;
+
+        public XnetHandler(Class<T> clazz) {
+            this.clazz = clazz;
+            LogUtil.i(TAG,"Proxy name %1$s",clazz.getName());
+        }
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            LogUtil.i(TAG,"NetworkService Method name %1$s,　Argument num %1$d",method.getName(),args.length);
-            LogUtil.i(TAG,"Proxy name %1$s",proxy.getClass().getName());
+            LogUtil.i(TAG,"NetworkService Method name %1$s,　Argument num %2$d",method.getName(),args.length);
+            LogUtil.d(TAG,"NetworkService Method annotation %1$s",method.getAnnotations()[0].annotationType().getName());
             return null;
         }
     }
