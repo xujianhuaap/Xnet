@@ -45,10 +45,11 @@ public class HttpResponse implements IResponse {
         this.message = message;
     }
 
-    public HttpResponse(int statusCode, String message, String contentType) {
+    public HttpResponse(int statusCode, String message, String contentType, byte[] datas) {
         this.statusCode = statusCode;
         this.message = message;
         this.contentType = contentType;
+        this.datas = datas;
     }
 
     @Override

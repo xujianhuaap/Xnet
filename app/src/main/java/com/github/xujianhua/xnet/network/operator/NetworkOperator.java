@@ -1,19 +1,16 @@
-package com.github.xujianhua.xnet.network;
+package com.github.xujianhua.xnet.network.operator;
 
-import android.text.TextUtils;
 
 import com.github.xujianhua.xnet.bean.HttpRequest;
 import com.github.xujianhua.xnet.bean.HttpResponse;
-import com.github.xujianhua.xnet.bean.IRequest;
 import com.github.xujianhua.xnet.bean.RequestMethod;
 import com.github.xujianhua.xnet.util.ExceptionUtil;
 import com.github.xujianhua.xnet.util.LogUtil;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -28,7 +25,7 @@ public class NetworkOperator {
 
     public static HttpResponse perfermRequest(HttpRequest request, HashMap<String,String>headerOptions){
         HttpURLConnection connection=null;
-        OutputStream outputStream=null;
+        InputStream inputStream=null;
         try {
             ExceptionUtil.nullExeption(request);
             String urlStr=request.getUrl();
@@ -67,17 +64,11 @@ public class NetworkOperator {
             connection.connect();
             int respCode=connection.getResponseCode();
             String msg=connection.getResponseMessage();
-            outputStream=connection.getOutputStream();
+            inputStream=connection.getInputStream();
             String contentType=connection.getContentType();
-            ExceptionUtil.nullExeption(outputStream);
-            byte[] buffer=new byte[1024];
-            while (){
-
-            }
-            outputStream.write();
-            outputStream.flush();
-            outputStream.close();
-            HttpResponse response=new HttpResponse(respCode,msg,contentType,outputStream);
+            ExceptionUtil.nullExeption(inputStream);
+            byte[] bytes= IOOperator.openInputStream(inputStream);
+            HttpResponse response=new HttpResponse(respCode,msg,contentType,bytes);
             LogUtil.i(TAG,"request"+request.toString());
             LogUtil.i(TAG,"reponse"+response.toString());
             LogUtil.i(TAG,"----------------------------------");
@@ -89,15 +80,7 @@ public class NetworkOperator {
             if(connection!=null){
                 connection.disconnect();
             }
-            if(outputStream!=null){
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }finally {
-                    return null;
-                }
-            }
+
         }
         return null;
     }
