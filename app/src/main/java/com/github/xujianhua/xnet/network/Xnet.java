@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Xnet {
     private Gson gson;
     private String charCoding;
+    private String host;
     private static Xnet xNet;
     private ConcurrentHashMap concurrentHashMap=new ConcurrentHashMap();//可扩展的线程安全的
 
