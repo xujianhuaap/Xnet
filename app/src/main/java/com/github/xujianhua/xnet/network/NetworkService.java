@@ -1,6 +1,7 @@
 package com.github.xujianhua.xnet.network;
 
 import com.github.xujianhua.xnet.util.LogUtil;
+import com.github.xujianhua.xnet.util.Test1;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -19,7 +20,7 @@ public class NetworkService {
      */
     public static <T> T getService(Class<T> clazz){
         isValidateService(clazz);
-        T t= (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, new XnetHandler(clazz));
+        T t= (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz, Test1.class}, new XnetHandler(clazz));
         return t;
     }
 
@@ -42,7 +43,7 @@ public class NetworkService {
 
         public XnetHandler(Class<T> clazz) {
             this.clazz = clazz;
-            LogUtil.i(TAG,"Proxy name %1$s",clazz.getName());
+            LogUtil.i(TAG, "Proxy name %1$s", clazz.getName());
         }
 
         @Override
