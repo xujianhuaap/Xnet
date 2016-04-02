@@ -8,6 +8,7 @@ import com.github.xujianhua.xnet.annotation.NetMethod;
 import com.github.xujianhua.xnet.annotation.Param;
 import com.github.xujianhua.xnet.bean.HttpRequest;
 import com.github.xujianhua.xnet.bean.RequestMethod;
+import com.github.xujianhua.xnet.excutor.Exutor;
 import com.github.xujianhua.xnet.util.LogUtil;
 import com.github.xujianhua.xnet.util.Test1;
 
@@ -89,7 +90,13 @@ public class NetworkService {
             String urlStr=UrlTool.generateUrlStr( builder.build());
             request.setUrl(urlStr);
             request.setRequestMethod(netMethod);
-            //执行
+            //开启新的线程来执行网络请求和响应
+            Exutor.getInstance().excute(new CallBackRunnable(){
+                @Override
+                public void obtainResponse() {
+                    super.obtainResponse();
+                }
+            });
 
             return null;
         }
