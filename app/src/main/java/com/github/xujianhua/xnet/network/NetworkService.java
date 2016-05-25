@@ -7,8 +7,10 @@ import com.github.xujianhua.xnet.annotation.Host;
 import com.github.xujianhua.xnet.annotation.NetMethod;
 import com.github.xujianhua.xnet.annotation.Param;
 import com.github.xujianhua.xnet.bean.HttpRequest;
+import com.github.xujianhua.xnet.bean.HttpResponse;
 import com.github.xujianhua.xnet.bean.RequestMethod;
 import com.github.xujianhua.xnet.excutor.Exutor;
+import com.github.xujianhua.xnet.network.operator.NetworkOperator;
 import com.github.xujianhua.xnet.util.LogUtil;
 import com.github.xujianhua.xnet.util.Test1;
 
@@ -16,6 +18,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
 import java.util.Hashtable;
 
 /**
@@ -59,7 +62,7 @@ public class NetworkService {
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            HttpRequest request=new HttpRequest();
+            final HttpRequest request=new HttpRequest();
             RequestMethod netMethod=null;
             UrlTool.Builder builder=new UrlTool.Builder();
 
@@ -91,10 +94,13 @@ public class NetworkService {
             request.setUrl(urlStr);
             request.setRequestMethod(netMethod);
             //开启新的线程来执行网络请求和响应
-            Exutor.getInstance().excute(new CallBackRunnable(){
+            Exutor.getInstance().excute(new CallBackRunnable() {
                 @Override
-                public void obtainResponse() {
-                    super.obtainResponse();
+                public HttpResponse obtainResponse() {
+                    HashMap<String,String> headers=new HashMap<String, String>();
+                    headers.put("APP_ID","app");
+                    headers.put("APP_VERSION","v1.0");
+                    return NetworkOperator.perfermRequest(request,headers);
                 }
             });
 

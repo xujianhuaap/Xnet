@@ -17,7 +17,5 @@ public class MainActivity extends AppCompatActivity {
         Xnet.getInstance();
         Test t=Xnet.create(Test.class);
         t.httpPost("bdwz","lili",null);
-
-
     }
 }

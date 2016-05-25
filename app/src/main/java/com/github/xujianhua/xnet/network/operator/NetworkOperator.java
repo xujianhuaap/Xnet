@@ -60,11 +60,13 @@ public class NetworkOperator {
                     connection.addRequestProperty(key,headerOptions.get(key));
                 }
             }
-
-            connection.connect();
             int respCode=connection.getResponseCode();
+            if(respCode!=200){
+                inputStream=connection.getErrorStream();
+            }else {
+                inputStream=connection.getInputStream();
+            }
             String msg=connection.getResponseMessage();
-            inputStream=connection.getInputStream();
             String contentType=connection.getContentType();
             ExceptionUtil.nullExeption(inputStream);
             byte[] bytes= IOOperator.openInputStream(inputStream);

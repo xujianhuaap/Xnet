@@ -7,7 +7,6 @@ import com.github.xujianhua.xnet.bean.HttpResponse;
  */
 public interface INetworkListener {
     public void start();
-    public void end();
-    public void success(int code, HttpResponse response);
-    public void failure();
+    public void success(int code, byte[] content);
+    public void failure(String msg);
 }

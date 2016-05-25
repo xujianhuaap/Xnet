@@ -24,7 +24,7 @@ public class Exutor {
         if(exutor==null){
             exutor=new Exutor();
         }
-        return null;
+        return exutor;
     }
 
     private Exutor() {

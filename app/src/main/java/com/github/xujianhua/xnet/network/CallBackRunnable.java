@@ -3,6 +3,7 @@ package com.github.xujianhua.xnet.network;
 import android.app.DownloadManager;
 
 import com.github.xujianhua.xnet.bean.HttpRequest;
+import com.github.xujianhua.xnet.bean.HttpResponse;
 import com.github.xujianhua.xnet.bean.IResponse;
 import com.github.xujianhua.xnet.excutor.MainThreadExcutor;
 import com.github.xujianhua.xnet.network.listener.INetworkListener;
@@ -20,6 +21,7 @@ public abstract class CallBackRunnable implements Runnable {
     private INetworkListener listener=new NetWorkListener();
     @Override
     public void run() {
+        final HttpResponse response=obtainResponse();
         mainThreadExcutor.execute(new Runnable() {
             @Override
             public void run() {
@@ -29,11 +31,18 @@ public abstract class CallBackRunnable implements Runnable {
         mainThreadExcutor.execute(new Runnable() {
             @Override
             public void run() {
-                IResponse response=obtainResponse();
-                listener.success();
-                listener.end();
+                if(response!=null){
+                    if(response.getStatusCode()==200){
+                        listener.success(ResponseStatus.RESPONSE_STATUS_SUCCESS,response.getDatas());
+                    }else {
+                        listener.failure(response.getMessage());
+                    }
+                }else{
+                    listener.failure("请检查网络");
+                }
+
             }
         });
     }
-    public abstract IResponse obtainResponse();
+    public abstract HttpResponse obtainResponse();
 }
