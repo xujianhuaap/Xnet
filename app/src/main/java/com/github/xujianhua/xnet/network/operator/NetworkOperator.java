@@ -61,7 +61,7 @@ public class NetworkOperator {
                 }
             }
             int respCode=connection.getResponseCode();
-            if(respCode!=200){
+            if(respCode!=HttpURLConnection.HTTP_OK){
                 inputStream=connection.getErrorStream();
             }else {
                 inputStream=connection.getInputStream();
