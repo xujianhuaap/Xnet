@@ -4,11 +4,13 @@ package com.github.xujianhua.xnet.network.operator;
 import com.github.xujianhua.xnet.bean.HttpRequest;
 import com.github.xujianhua.xnet.bean.HttpResponse;
 import com.github.xujianhua.xnet.bean.RequestMethod;
+import com.github.xujianhua.xnet.bean.TypeOutput;
 import com.github.xujianhua.xnet.util.ExceptionUtil;
 import com.github.xujianhua.xnet.util.LogUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ public class NetworkOperator {
     public static HttpResponse perfermRequest(HttpRequest request, HashMap<String,String>headerOptions){
         HttpURLConnection connection=null;
         InputStream inputStream=null;
+        OutputStream outputstream=null;
         try {
             ExceptionUtil.nullExeption(request);
             String urlStr=request.getUrl();
@@ -60,6 +63,13 @@ public class NetworkOperator {
                     connection.addRequestProperty(key,headerOptions.get(key));
                 }
             }
+
+            //Multipart
+            outputstream=connection.getOutputStream();
+            TypeOutput typeOutput=request.getBody();
+            byte[] content=typeOutput.getContent();
+            outputstream.write(content);
+
             int respCode=connection.getResponseCode();
             if(respCode!=HttpURLConnection.HTTP_OK){
                 inputStream=connection.getErrorStream();

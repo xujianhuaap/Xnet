@@ -9,7 +9,15 @@ public class HttpRequest implements IRequest {
     private int readTimeOut=-1;
     private int connectTimeOut=-1;
     private boolean isCache;
+    private TypeOutput body;
 
+    public void setBody(TypeOutput body) {
+        this.body = body;
+    }
+
+    public TypeOutput getBody() {
+        return body;
+    }
 
     public boolean isCache() {
         return isCache;
