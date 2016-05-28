@@ -7,6 +7,7 @@ import com.github.xujianhua.xnet.util.LogUtil;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 /**
  * Created by xujianhua on 19/03/16.
@@ -27,7 +28,7 @@ public class IOOperator {
             baos.flush();
             inputStream.close();
             baos.close();
-            LogUtil.i(TAG,"IOOperator openInputStream result"+new String(bytes, Xnet.getInstance().getCharCoding()));
+//            LogUtil.i(TAG,"IOOperator openInputStream result"+new String(bytes, Charset.forName("UTF-8")));
             return bytes;
         } catch (IOException e) {
             e.printStackTrace();

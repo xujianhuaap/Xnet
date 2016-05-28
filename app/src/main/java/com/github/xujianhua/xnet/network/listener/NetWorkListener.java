@@ -10,17 +10,12 @@ public class NetWorkListener implements INetworkListener{
     }
 
     @Override
-    public void end() {
+    public void success(int code, byte[] content) {
 
     }
 
     @Override
-    public void success() {
-
-    }
-
-    @Override
-    public void failure() {
+    public void failure(String msg) {
 
     }
 }

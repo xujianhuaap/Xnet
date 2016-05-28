@@ -10,6 +10,7 @@ public class HttpRequest implements IRequest {
     private int connectTimeOut=-1;
     private boolean isCache;
 
+
     public boolean isCache() {
         return isCache;
     }
