@@ -30,7 +30,6 @@ public abstract class CallBackRunnable implements Runnable {
             @Override
             public void run() {
                 IResponse response=obtainResponse();
-                listener.success();
                 listener.end();
             }
         });
