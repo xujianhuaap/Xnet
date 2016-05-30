@@ -95,8 +95,12 @@ public class NetworkService {
                 if(annotation.annotationType()== MultiPart.class){
                     mimeType=((MultiPart)annotation).value();
                     TypeOutput typeoutput=request.getBody();
+                    if(typeoutput==null){
+                        typeoutput=new TypeOutput();
+                    }
                     typeoutput.setMimeType(mimeType);
                     request.setBody(typeoutput);
+                    request.setMultiPart(true);
                 }
             }
             //httpMethod 中的参数
@@ -124,9 +128,11 @@ public class NetworkService {
             Exutor.getInstance().excute(new CallBackRunnable(networkListener) {
                 @Override
                 public HttpResponse obtainResponse() {
+                    //设置相关Header
                     HashMap<String,String> headers=new HashMap<String, String>();
                     headers.put("APP_ID","app");
                     headers.put("APP_VERSION","v1.0");
+
                     return NetworkOperator.perfermRequest(request,headers);
                 }
             });

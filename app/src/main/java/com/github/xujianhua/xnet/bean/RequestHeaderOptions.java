@@ -74,5 +74,9 @@ public class RequestHeaderOptions {
      *  Allow: GET, HEAD, PUT(CRLF)
      */
     public static final String ALLOW="Allow";
+    /***
+     *
+     */
+    public static final String TANSFER_CODING="Transfer-Coding";
 
 }

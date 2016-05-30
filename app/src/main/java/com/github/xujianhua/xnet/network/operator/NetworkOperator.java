@@ -3,6 +3,7 @@ package com.github.xujianhua.xnet.network.operator;
 
 import com.github.xujianhua.xnet.bean.HttpRequest;
 import com.github.xujianhua.xnet.bean.HttpResponse;
+import com.github.xujianhua.xnet.bean.RequestHeaderOptions;
 import com.github.xujianhua.xnet.bean.RequestMethod;
 import com.github.xujianhua.xnet.bean.TypeOutput;
 import com.github.xujianhua.xnet.util.ExceptionUtil;
@@ -36,6 +37,8 @@ public class NetworkOperator {
             int connectTimeOut=request.getConnectTimeOut();
             RequestMethod requestMethod=request.getRequestMethod();
             boolean isCache=request.isCache();
+            boolean isMultiPart=request.isMultiPart();
+            TypeOutput typeOutput=request.getBody();
 
             ExceptionUtil.nullExeption(urlStr);
             URL url=new URL(request.getUrl());
@@ -55,7 +58,17 @@ public class NetworkOperator {
             connection.setDefaultUseCaches(isCache);
             connection.setDoInput(true);
             connection.setDoOutput(true);
+            //设置相关的header
             if(headerOptions!=null&&!headerOptions.isEmpty()){
+                if(isMultiPart){
+                    headerOptions.put(RequestHeaderOptions.CONTENT_TYPE,"multipart/form-data");
+                    if(typeOutput!=null){
+                        byte[] contents=typeOutput.getContent();
+                        if(contents.length>0){
+                            headerOptions.put(RequestHeaderOptions.TANSFER_CODING,"chunked");
+                        }
+                    }
+                }
                 Set<String> keys=headerOptions.keySet();
                 Iterator<String> iterator=keys.iterator();
                 while (iterator.hasNext()){
@@ -66,7 +79,6 @@ public class NetworkOperator {
 
             //Multipart
             outputstream=connection.getOutputStream();
-            TypeOutput typeOutput=request.getBody();
             byte[] content=typeOutput.getContent();
             outputstream.write(content);
 

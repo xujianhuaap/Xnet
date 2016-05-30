@@ -9,7 +9,16 @@ public class HttpRequest implements IRequest {
     private int readTimeOut=-1;
     private int connectTimeOut=-1;
     private boolean isCache;
+    private boolean isMultiPart;
     private TypeOutput body;
+
+    public boolean isMultiPart() {
+        return isMultiPart;
+    }
+
+    public void setMultiPart(boolean multiPart) {
+        isMultiPart = multiPart;
+    }
 
     public void setBody(TypeOutput body) {
         this.body = body;
