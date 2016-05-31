@@ -63,7 +63,7 @@ public class NetworkOperator {
             //设置相关的header
             if(headerOptions!=null&&!headerOptions.isEmpty()){
                 if(isMultiPart){
-                    headerOptions.put(RequestHeaderOptions.CONTENT_TYPE,"multipart/form-data;boundary=$----boundary----$");
+                    headerOptions.put(RequestHeaderOptions.CONTENT_TYPE,"multipart/form-data;boundary="+BOUNDARY);
                     if(typeOutput!=null){
                         byte[] contents=typeOutput.getContent();
                         if(contents.length>0){
@@ -82,11 +82,13 @@ public class NetworkOperator {
             //Multipart
             outputstream=connection.getOutputStream();
             byte[] content=typeOutput.getContent();
+            outputstream.write((BOUNDARY+CRLF).getBytes());
             outputstream.write(("Content-Disposition: form-data;filename=\"平凡的世界.txt\""+CRLF).getBytes());
             outputstream.write((BOUNDARY+CRLF).getBytes());
             outputstream.write(("Content-Disposition: form-data;name=\"novel\""+CRLF).getBytes());
             outputstream.write((BOUNDARY+CRLF).getBytes());
             outputstream.write(content);
+            outputstream.write((BOUNDARY+CRLF).getBytes());
 
             int respCode=connection.getResponseCode();
             if(respCode!=HttpURLConnection.HTTP_OK){

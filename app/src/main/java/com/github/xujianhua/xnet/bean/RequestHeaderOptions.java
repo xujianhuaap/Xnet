@@ -59,7 +59,7 @@ public class RequestHeaderOptions {
      * 实体包头设置
      * Content-Type: text/html; charset=ISO-8859-4
      */
-    public static final String CONTENT_TYPE="Contnet-Type";
+    public static final String CONTENT_TYPE="Content-Type";
     /***
      * 实体包头设置
      * Content-Length: 3495
