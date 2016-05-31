@@ -47,7 +47,7 @@ public class UrlTool {
     public static String generateUrlStr(UrlTool urlTool){
         StringBuffer stringBuffer=new StringBuffer();
         stringBuffer.append(urlTool.getHost().trim()).append(urlTool.getPath().trim());
-        Hashtable<String,String> params=urlTool.getParameters();
+        Hashtable<String,Object> params=urlTool.getParameters();
         if(params!=null){
             Set<String> keys=params.keySet();
             if(!keys.isEmpty()){

@@ -1,11 +1,10 @@
 package com.github.xujianhua.xnet.network;
 
-import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 
 import com.github.xujianhua.xnet.annotation.Api;
 import com.github.xujianhua.xnet.annotation.Bitmap;
-import com.github.xujianhua.xnet.annotation.File;
+import com.github.xujianhua.xnet.annotation.FileAnnotation;
 import com.github.xujianhua.xnet.annotation.Host;
 import com.github.xujianhua.xnet.annotation.MultiPart;
 import com.github.xujianhua.xnet.annotation.NetMethod;
@@ -203,7 +202,7 @@ public class NetworkService {
             }
             i++;
         }
-        if(annotation.annotationType()== File.class){
+        if(annotation.annotationType()== FileAnnotation.class){
             Object obj=args[i];
             if(obj instanceof java.io.File){
                 java.io.File file=(java.io.File) obj;

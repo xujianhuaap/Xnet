@@ -25,6 +25,8 @@ public class NetworkOperator {
     public static final String TAG=NetworkOperator.class.getName();
     public static final int DEFAULT_READ_TIME_OUT=10000;
     public static final int DEFAULT_CONNECT_TIME_OUT=10000;
+    public static final String BOUNDARY="----$end----------";
+    public static final String CRLF="\r\n";
 
     public static HttpResponse perfermRequest(HttpRequest request, HashMap<String,String>headerOptions){
         HttpURLConnection connection=null;
@@ -61,7 +63,7 @@ public class NetworkOperator {
             //设置相关的header
             if(headerOptions!=null&&!headerOptions.isEmpty()){
                 if(isMultiPart){
-                    headerOptions.put(RequestHeaderOptions.CONTENT_TYPE,"multipart/form-data");
+                    headerOptions.put(RequestHeaderOptions.CONTENT_TYPE,"multipart/form-data;boundary=$----boundary----$");
                     if(typeOutput!=null){
                         byte[] contents=typeOutput.getContent();
                         if(contents.length>0){
@@ -80,6 +82,10 @@ public class NetworkOperator {
             //Multipart
             outputstream=connection.getOutputStream();
             byte[] content=typeOutput.getContent();
+            outputstream.write(("Content-Disposition: form-data;filename=\"平凡的世界.txt\""+CRLF).getBytes());
+            outputstream.write((BOUNDARY+CRLF).getBytes());
+            outputstream.write(("Content-Disposition: form-data;name=\"novel\""+CRLF).getBytes());
+            outputstream.write((BOUNDARY+CRLF).getBytes());
             outputstream.write(content);
 
             int respCode=connection.getResponseCode();
@@ -99,7 +105,6 @@ public class NetworkOperator {
             return response;
         } catch (IOException e) {
             e.printStackTrace();
-            LogUtil.i(TAG,e.getMessage());
         }finally {
             if(connection!=null){
                 connection.disconnect();
