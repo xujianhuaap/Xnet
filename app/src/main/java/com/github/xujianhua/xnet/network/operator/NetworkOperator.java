@@ -27,6 +27,7 @@ public class NetworkOperator {
     public static final int DEFAULT_CONNECT_TIME_OUT=10000;
     public static final String BOUNDARY="----$end----------";
     public static final String CRLF="\r\n";
+    public static final String PREFIX="--";
 
     public static HttpResponse perfermRequest(HttpRequest request, HashMap<String,String>headerOptions){
         HttpURLConnection connection=null;
@@ -62,34 +63,44 @@ public class NetworkOperator {
             connection.setDoOutput(true);
             //设置相关的header
             if(headerOptions!=null&&!headerOptions.isEmpty()){
-                if(isMultiPart){
-                    headerOptions.put(RequestHeaderOptions.CONTENT_TYPE,"multipart/form-data;boundary="+BOUNDARY);
-                    if(typeOutput!=null){
-                        byte[] contents=typeOutput.getContent();
-                        if(contents.length>0){
-                            headerOptions.put(RequestHeaderOptions.TANSFER_CODING,"chunked");
-                        }
-                    }
-                }
                 Set<String> keys=headerOptions.keySet();
                 Iterator<String> iterator=keys.iterator();
                 while (iterator.hasNext()){
                     String key=iterator.next();
                     connection.addRequestProperty(key,headerOptions.get(key));
                 }
+                if(isMultiPart){
+                    connection.setRequestProperty(RequestHeaderOptions.CONTENT_TYPE,"multipart/form-data;boundary="+BOUNDARY);
+                    if(typeOutput!=null){
+                        byte[] contents=typeOutput.getContent();
+                        if(contents.length>0){
+                            connection.setChunkedStreamingMode(0);
+                        }
+                    }
+                }
             }
 
             //Multipart
-            outputstream=connection.getOutputStream();
-            byte[] content=typeOutput.getContent();
-            outputstream.write((BOUNDARY+CRLF).getBytes());
-            outputstream.write(("Content-Disposition: form-data;filename=\"平凡的世界.txt\""+CRLF).getBytes());
-            outputstream.write((BOUNDARY+CRLF).getBytes());
-            outputstream.write(("Content-Disposition: form-data;name=\"novel\""+CRLF).getBytes());
-            outputstream.write((BOUNDARY+CRLF).getBytes());
-            outputstream.write(content);
-            outputstream.write((BOUNDARY+CRLF).getBytes());
-
+            if(isMultiPart){
+                outputstream=connection.getOutputStream();
+                byte[] content=typeOutput.getContent();
+                outputstream.write((PREFIX+BOUNDARY+CRLF).getBytes());
+                outputstream.write(("Content-Type: text/plain"+CRLF).getBytes());
+                outputstream.write(("Content-Disposition: form-data;name=novel"+CRLF+CRLF).getBytes());
+//                outputstream.write("平凡的世界.pdf".getBytes());
+//                outputstream.write(CRLF.getBytes());
+//                outputstream.write((PREFIX+BOUNDARY+CRLF).getBytes());
+//                outputstream.write(("Content-Disposition: form-data;name=content;filename=平凡的世界"+CRLF).getBytes());
+//                outputstream.write( ("Content-Type: application/octet-stream"+CRLF).getBytes());
+//                outputstream.write( ("Content-Transfer-Encoding: binary"+CRLF+CRLF ).getBytes());
+                outputstream.write(content);
+                LogUtil.i(TAG,"multipart content"+content.length);
+                outputstream.write(CRLF.getBytes());
+                outputstream.write((PREFIX+BOUNDARY+PREFIX).getBytes());
+                outputstream.write(CRLF.getBytes());
+                outputstream.flush();
+//            outputstream.close();
+            }
             int respCode=connection.getResponseCode();
             if(respCode!=HttpURLConnection.HTTP_OK){
                 inputStream=connection.getErrorStream();
