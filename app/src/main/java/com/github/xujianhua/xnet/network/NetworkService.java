@@ -13,12 +13,12 @@ import com.github.xujianhua.xnet.bean.HttpRequest;
 import com.github.xujianhua.xnet.bean.HttpResponse;
 import com.github.xujianhua.xnet.bean.MimeType;
 import com.github.xujianhua.xnet.bean.RequestMethod;
-import com.github.xujianhua.xnet.bean.TypeOutput;
+import com.github.xujianhua.xnet.bean.typeoutput.FileOutput;
+import com.github.xujianhua.xnet.bean.typeoutput.TypeOutput;
 import com.github.xujianhua.xnet.excutor.Exutor;
 import com.github.xujianhua.xnet.network.listener.INetworkListener;
 import com.github.xujianhua.xnet.network.operator.NetworkOperator;
 import com.github.xujianhua.xnet.util.LogUtil;
-import com.github.xujianhua.xnet.util.Test1;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
@@ -44,7 +44,7 @@ public class NetworkService {
      */
     public static <T> T getService(Class<T> clazz){
         isValidateService(clazz);
-        T t= (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz, Test1.class}, new XnetHandler(clazz));
+        T t= (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, new XnetHandler(clazz));
         return t;
     }
 
@@ -65,6 +65,10 @@ public class NetworkService {
     public static class XnetHandler<T> implements InvocationHandler{
         private Class<T> clazz;
 
+        private  MimeType mimeType;
+        private  TypeOutput typeOutput;
+        private FileOutput fileOutput;
+
         public XnetHandler(Class<T> clazz) {
             this.clazz = clazz;
             LogUtil.i(TAG, "Proxy name %1$s", clazz.getName());
@@ -73,10 +77,8 @@ public class NetworkService {
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             final HttpRequest request=new HttpRequest();
-            request.setBody(new TypeOutput());
             RequestMethod netMethod=null;
             UrlTool.Builder builder=new UrlTool.Builder();
-            MimeType mimeType=null;
 
             //Service 的注解
             Annotation[] interfaceAnnotation=clazz.getAnnotations();
@@ -93,12 +95,6 @@ public class NetworkService {
                 netMethod=getRequestMethod(netMethod,annotation);
                 if(annotation.annotationType()== MultiPart.class){
                     mimeType=((MultiPart)annotation).value();
-                    TypeOutput typeoutput=request.getBody();
-                    if(typeoutput==null){
-                        typeoutput=new TypeOutput();
-                    }
-                    typeoutput.setMimeType(mimeType);
-                    request.setBody(typeoutput);
                     request.setMultiPart(true);
                 }
             }
@@ -138,6 +134,85 @@ public class NetworkService {
 
             return null;
         }
+
+
+        /***
+         *
+         * @param args
+         * @param paramter
+         * @param i
+         * @param annotation
+         * @return
+         */
+        private  int parseParamterAnnotation(Object[] args, Hashtable<String, Object> paramter, int i, Annotation annotation) {
+            if(annotation.annotationType()== Param.class){
+                String key=((Param)annotation).value();
+                LogUtil.d(TAG,"HttpMethod Paramter key\t %1$s,value \t %2$s",key,args[i]+"");
+                if(TextUtils.isEmpty(key)){
+                    throw new RuntimeException("HashTable key can not null");
+                }
+                paramter.put(key,args[i]);
+                i++;
+            }
+            return i;
+
+        }
+
+
+        /***
+         *
+         * @param args
+         * @param request
+         * @param i
+         * @param annotation
+         * @return
+         */
+        private  int parseMultiPartAnnotation(Object[] args,HttpRequest request,int i, Annotation annotation){
+            //设置要上传的文件或Bitmap
+            if(annotation.annotationType()== Bitmap.class){
+                Object obj=args[i];
+                if(obj instanceof android.graphics.Bitmap){
+                    android.graphics.Bitmap bitmap=(android.graphics.Bitmap)obj;
+                    ByteArrayOutputStream baos=new ByteArrayOutputStream();
+                    bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG,100,baos);
+                    if(typeOutput==null){
+                        typeOutput=new TypeOutput();
+                    }
+                    typeOutput.setContent(baos.toByteArray());
+                    typeOutput.setMimeType(mimeType);
+                    request.setBody(typeOutput);
+                }
+                i++;
+            }
+            if(annotation.annotationType()== FileAnnotation.class){
+                Object obj=args[i];
+                if(obj instanceof java.io.File){
+                    java.io.File file=(java.io.File) obj;
+                    try {
+                        FileInputStream fileInputStream= new FileInputStream(file);
+                        ByteArrayOutputStream baos=new ByteArrayOutputStream();
+                        byte[] buffer=new byte[1024*3];
+                        int cnt=0;
+                        while ((cnt=fileInputStream.read(buffer))!=-1){
+                            baos.write(buffer,0,cnt);
+                        }
+                        if(fileOutput==null){
+                            fileOutput=new FileOutput();
+                        }
+                        fileOutput.setFileName(file.getName());
+                        fileOutput.setContent(baos.toByteArray());
+                        fileOutput.setMimeType(mimeType);
+                        request.setBody(fileOutput);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                i++;
+            }
+            return i;
+        }
     }
 
     /***
@@ -154,82 +229,7 @@ public class NetworkService {
         return netMethod;
     }
 
-    /***
-     *
-     * @param args
-     * @param paramter
-     * @param i
-     * @param annotation
-     * @return
-     */
-    private static int parseParamterAnnotation(Object[] args, Hashtable<String, Object> paramter, int i, Annotation annotation) {
-        if(annotation.annotationType()== Param.class){
-            String key=((Param)annotation).value();
-            LogUtil.d(TAG,"HttpMethod Paramter key\t %1$s,value \t %2$s",key,args[i]+"");
-            if(TextUtils.isEmpty(key)){
-                throw new RuntimeException("HashTable key can not null");
-            }
-            paramter.put(key,args[i]);
-            i++;
-        }
-        return i;
 
-    }
-
-    /***
-     *
-     * @param args
-     * @param request
-     * @param i
-     * @param annotation
-     * @return
-     */
-    private static int parseMultiPartAnnotation(Object[] args,HttpRequest request,int i, Annotation annotation){
-        //设置要上传的文件或Bitmap
-        if(annotation.annotationType()== Bitmap.class){
-            Object obj=args[i];
-            if(obj instanceof android.graphics.Bitmap){
-                android.graphics.Bitmap bitmap=(android.graphics.Bitmap)obj;
-                ByteArrayOutputStream baos=new ByteArrayOutputStream();
-                bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG,100,baos);
-                TypeOutput typeOutput=request.getBody();
-                if(typeOutput==null){
-                    typeOutput=new TypeOutput();
-                }
-                typeOutput.setContent(baos.toByteArray());
-                typeOutput.setMimeType(MimeType.IMAGE_PNG);
-                request.setBody(typeOutput);
-            }
-            i++;
-        }
-        if(annotation.annotationType()== FileAnnotation.class){
-            Object obj=args[i];
-            if(obj instanceof java.io.File){
-                java.io.File file=(java.io.File) obj;
-                try {
-                    FileInputStream fileInputStream= new FileInputStream(file);
-                    ByteArrayOutputStream baos=new ByteArrayOutputStream();
-                    byte[] buffer=new byte[1024*3];
-                    int cnt=0;
-                    while ((cnt=fileInputStream.read(buffer))!=-1){
-                        baos.write(buffer,0,cnt);
-                    }
-                    TypeOutput typeOutput=request.getBody();
-                    if(typeOutput==null){
-                        typeOutput=new TypeOutput();
-                    }
-                    typeOutput.setContent(baos.toByteArray());
-                    request.setBody(typeOutput);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            i++;
-        }
-        return i;
-    }
 
     /***
      *

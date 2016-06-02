@@ -24,9 +24,9 @@ public interface Test {
     void httpPost(@Param("UserName") String name, @Param("Age")int age, @Param("Gender")boolean gender, INetworkListener listener);
 
     @Api("/user/favourite")
-    @Host("http://192.168.23.77:9090")
+    @Host("http://192.168.23.90:9090")
     @NetMethod(RequestMethod.POST)
-    @MultiPart(MimeType.TEXT)
+    @MultiPart(MimeType.BINARY_STREAM)
     void httpPostBitmap(@Param("UserName")  String name, @Param("Age")int age, @Param("Gender")boolean gender, @FileAnnotation File bmp, INetworkListener listener);
 
 

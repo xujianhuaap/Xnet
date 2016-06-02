@@ -1,5 +1,7 @@
 package com.github.xujianhua.xnet.bean;
 
+import com.github.xujianhua.xnet.bean.typeoutput.TypeOutput;
+
 /**
  * Created by xujianhua on 2016/3/17.
  */

@@ -3,9 +3,13 @@ package com.github.xujianhua.xnet.network.operator;
 
 import com.github.xujianhua.xnet.bean.HttpRequest;
 import com.github.xujianhua.xnet.bean.HttpResponse;
+import com.github.xujianhua.xnet.bean.MimeType;
 import com.github.xujianhua.xnet.bean.RequestHeaderOptions;
 import com.github.xujianhua.xnet.bean.RequestMethod;
-import com.github.xujianhua.xnet.bean.TypeOutput;
+import com.github.xujianhua.xnet.bean.typeoutput.FileOutput;
+import com.github.xujianhua.xnet.bean.typeoutput.TypeOutput;
+import com.github.xujianhua.xnet.network.multipart.MultiPartUtil;
+import com.github.xujianhua.xnet.network.multipart.MultiPart;
 import com.github.xujianhua.xnet.util.ExceptionUtil;
 import com.github.xujianhua.xnet.util.LogUtil;
 
@@ -25,9 +29,6 @@ public class NetworkOperator {
     public static final String TAG=NetworkOperator.class.getName();
     public static final int DEFAULT_READ_TIME_OUT=10000;
     public static final int DEFAULT_CONNECT_TIME_OUT=10000;
-    public static final String BOUNDARY="----$end----------";
-    public static final String CRLF="\r\n";
-    public static final String PREFIX="--";
 
     public static HttpResponse perfermRequest(HttpRequest request, HashMap<String,String>headerOptions){
         HttpURLConnection connection=null;
@@ -70,7 +71,7 @@ public class NetworkOperator {
                     connection.addRequestProperty(key,headerOptions.get(key));
                 }
                 if(isMultiPart){
-                    connection.setRequestProperty(RequestHeaderOptions.CONTENT_TYPE,"multipart/form-data;boundary="+BOUNDARY);
+                    connection.setRequestProperty(RequestHeaderOptions.CONTENT_TYPE,"multipart/form-data;boundary="+ MultiPartUtil.BOUNDARY);
                     if(typeOutput!=null){
                         byte[] contents=typeOutput.getContent();
                         if(contents.length>0){
@@ -84,22 +85,15 @@ public class NetworkOperator {
             if(isMultiPart){
                 outputstream=connection.getOutputStream();
                 byte[] content=typeOutput.getContent();
-                outputstream.write((PREFIX+BOUNDARY+CRLF).getBytes());
-                outputstream.write(("Content-Type: text/plain"+CRLF).getBytes());
-                outputstream.write(("Content-Disposition: form-data;name=novel"+CRLF+CRLF).getBytes());
-//                outputstream.write("平凡的世界.pdf".getBytes());
-//                outputstream.write(CRLF.getBytes());
-//                outputstream.write((PREFIX+BOUNDARY+CRLF).getBytes());
-//                outputstream.write(("Content-Disposition: form-data;name=content;filename=平凡的世界"+CRLF).getBytes());
-//                outputstream.write( ("Content-Type: application/octet-stream"+CRLF).getBytes());
-//                outputstream.write( ("Content-Transfer-Encoding: binary"+CRLF+CRLF ).getBytes());
-                outputstream.write(content);
-                LogUtil.i(TAG,"multipart content"+content.length);
-                outputstream.write(CRLF.getBytes());
-                outputstream.write((PREFIX+BOUNDARY+PREFIX).getBytes());
-                outputstream.write(CRLF.getBytes());
+                if(typeOutput.getMimeType()== MimeType.BINARY_STREAM){
+                    //上传文件
+                    FileOutput fileOutput=(FileOutput) typeOutput;
+                    String fileName=fileOutput.getFileName();
+                    MultiPart.build(outputstream,fileName,content,typeOutput.getMimeType());
+                }else {
+                    //上传图片？？？？？
+                }
                 outputstream.flush();
-//            outputstream.close();
             }
             int respCode=connection.getResponseCode();
             if(respCode!=HttpURLConnection.HTTP_OK){

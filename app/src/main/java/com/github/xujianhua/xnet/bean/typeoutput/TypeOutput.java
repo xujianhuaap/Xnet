@@ -1,4 +1,6 @@
-package com.github.xujianhua.xnet.bean;
+package com.github.xujianhua.xnet.bean.typeoutput;
+
+import com.github.xujianhua.xnet.bean.MimeType;
 
 import java.io.OutputStream;
 

@@ -13,9 +13,9 @@ public enum MimeType {
     AUDIO_MP3(30,"audio/mp3"),//.mp3文件
     AUDIO_WAV(31,"audio/wav"),//.wav
     BMP(4,"application/x-bmp"),//.bmp
-    APK(5,"application/vnd.android.package-archive")//.apk
-
-    ;
+    APK(5,"application/vnd.android.package-archive"),//.apk
+    BINARY_STREAM(6,"application/octet-stream"),//.*未知文件
+     ;
     private int key;
     private String value;
 
