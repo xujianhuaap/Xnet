@@ -3,7 +3,7 @@ package com.github.xujianhua.xnet.network;
 import android.text.TextUtils;
 
 import com.github.xujianhua.xnet.annotation.Api;
-import com.github.xujianhua.xnet.annotation.Bitmap;
+import com.github.xujianhua.xnet.annotation.BitmapAnnotation;
 import com.github.xujianhua.xnet.annotation.FileAnnotation;
 import com.github.xujianhua.xnet.annotation.Host;
 import com.github.xujianhua.xnet.annotation.MultiPart;
@@ -13,8 +13,8 @@ import com.github.xujianhua.xnet.bean.HttpRequest;
 import com.github.xujianhua.xnet.bean.HttpResponse;
 import com.github.xujianhua.xnet.bean.MimeType;
 import com.github.xujianhua.xnet.bean.RequestMethod;
+import com.github.xujianhua.xnet.bean.typeoutput.BitmapOutput;
 import com.github.xujianhua.xnet.bean.typeoutput.FileOutput;
-import com.github.xujianhua.xnet.bean.typeoutput.TypeOutput;
 import com.github.xujianhua.xnet.excutor.Exutor;
 import com.github.xujianhua.xnet.network.listener.INetworkListener;
 import com.github.xujianhua.xnet.network.operator.NetworkOperator;
@@ -66,7 +66,7 @@ public class NetworkService {
         private Class<T> clazz;
 
         private  MimeType mimeType;
-        private  TypeOutput typeOutput;
+        private BitmapOutput bitmapOutput;
         private FileOutput fileOutput;
 
         public XnetHandler(Class<T> clazz) {
@@ -169,18 +169,19 @@ public class NetworkService {
          */
         private  int parseMultiPartAnnotation(Object[] args,HttpRequest request,int i, Annotation annotation){
             //设置要上传的文件或Bitmap
-            if(annotation.annotationType()== Bitmap.class){
+            if(annotation.annotationType()== BitmapAnnotation.class){
                 Object obj=args[i];
                 if(obj instanceof android.graphics.Bitmap){
                     android.graphics.Bitmap bitmap=(android.graphics.Bitmap)obj;
                     ByteArrayOutputStream baos=new ByteArrayOutputStream();
                     bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG,100,baos);
-                    if(typeOutput==null){
-                        typeOutput=new TypeOutput();
+                    if(bitmapOutput ==null){
+                        bitmapOutput =new BitmapOutput();
                     }
-                    typeOutput.setContent(baos.toByteArray());
-                    typeOutput.setMimeType(mimeType);
-                    request.setBody(typeOutput);
+                    bitmapOutput.setSize(bitmap.getByteCount());
+                    bitmapOutput.setContent(baos.toByteArray());
+                    bitmapOutput.setMimeType(mimeType);
+                    request.setBody(bitmapOutput);
                 }
                 i++;
             }

@@ -6,6 +6,7 @@ import com.github.xujianhua.xnet.bean.HttpResponse;
 import com.github.xujianhua.xnet.bean.MimeType;
 import com.github.xujianhua.xnet.bean.RequestHeaderOptions;
 import com.github.xujianhua.xnet.bean.RequestMethod;
+import com.github.xujianhua.xnet.bean.typeoutput.BitmapOutput;
 import com.github.xujianhua.xnet.bean.typeoutput.FileOutput;
 import com.github.xujianhua.xnet.bean.typeoutput.TypeOutput;
 import com.github.xujianhua.xnet.network.multipart.MultiPartUtil;
@@ -89,9 +90,11 @@ public class NetworkOperator {
                     //上传文件
                     FileOutput fileOutput=(FileOutput) typeOutput;
                     String fileName=fileOutput.getFileName();
-                    MultiPart.build(outputstream,fileName,content,typeOutput.getMimeType());
+                    MultiPart.buildFile(outputstream,fileName,content,typeOutput.getMimeType());
                 }else {
-                    //上传图片？？？？？
+                    //上传图片
+                    BitmapOutput bitmapOutput=(BitmapOutput) typeOutput;
+                    MultiPart.buildBitmap(outputstream,bitmapOutput.getSize(),content,bitmapOutput.getMimeType());
                 }
                 outputstream.flush();
             }

@@ -1,7 +1,9 @@
 package com.github.xujianhua.xnet;
 
+import android.graphics.Bitmap;
+
 import com.github.xujianhua.xnet.annotation.Api;
-import com.github.xujianhua.xnet.annotation.FileAnnotation;
+import com.github.xujianhua.xnet.annotation.BitmapAnnotation;
 import com.github.xujianhua.xnet.annotation.Host;
 import com.github.xujianhua.xnet.annotation.MultiPart;
 import com.github.xujianhua.xnet.annotation.NetMethod;
@@ -26,8 +28,9 @@ public interface Test {
     @Api("/user/favourite")
     @Host("http://192.168.23.90:9090")
     @NetMethod(RequestMethod.POST)
-    @MultiPart(MimeType.BINARY_STREAM)
-    void httpPostBitmap(@Param("UserName")  String name, @Param("Age")int age, @Param("Gender")boolean gender, @FileAnnotation File bmp, INetworkListener listener);
+    @MultiPart(MimeType.IMAGE_JPEG)
+    void httpPostBitmap(@Param("UserName")  String name, @Param("Age")int age, @Param("Gender")boolean gender, @BitmapAnnotation Bitmap bmp, INetworkListener listener);
+
 
 
 }

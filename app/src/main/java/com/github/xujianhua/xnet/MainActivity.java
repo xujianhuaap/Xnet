@@ -1,13 +1,17 @@
 package com.github.xujianhua.xnet;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.github.xujianhua.xnet.annotation.FileAnnotation;
 import com.github.xujianhua.xnet.network.Xnet;
 import com.github.xujianhua.xnet.network.listener.INetworkListener;
 import com.github.xujianhua.xnet.util.FileUtils;
+import com.github.xujianhua.xnet.util.LogUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,18 +29,19 @@ public class MainActivity extends AppCompatActivity {
         Xnet.getInstance();
         Test t=Xnet.create(Test.class);
 
-        String filename="平凡的世界.txt";
-        File file= FileUtils.createInstorageFile(this,filename);
-        try {
-            FileOutputStream outputStream=openFileOutput(filename,MODE_PRIVATE);
-            outputStream.write("平凡的世界,路遥".getBytes());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        t.httpPostBitmap("xu01", 27, true,file, new INetworkListener() {
+//        String filename="平凡的世界.txt";
+//        File file= FileUtils.createInstorageFile(this,filename);
+//        try {
+//            FileOutputStream outputStream=openFileOutput(filename,MODE_PRIVATE);
+//            outputStream.write("平凡的世界,路遥".getBytes());
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+        Bitmap bitmap=BitmapFactory.decodeResource(getResources(),R.mipmap.zhaozilong);
+        LogUtil.d("NetWork",""+bitmap.getByteCount());
+        t.httpPostBitmap("xu01", 27, true,bitmap, new INetworkListener() {
             @Override
             public void start() {
 
@@ -44,12 +49,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void success(int code, byte[] content) {
-                TextView tv=(TextView)findViewById(R.id.content);
-                try {
-                    tv.setText(new String(content,"UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                }
+                ImageView tv=(ImageView) findViewById(R.id.content);
+                Bitmap bitmap=BitmapFactory.decodeByteArray(content,0,content.length);
+                tv.setImageBitmap(bitmap);
             }
 
             @Override

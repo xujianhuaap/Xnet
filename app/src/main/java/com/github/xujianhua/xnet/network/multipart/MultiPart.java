@@ -15,7 +15,7 @@ public class MultiPart {
      * @param fileName
      * @param content
      */
-    public static void build(OutputStream outputstream, String fileName, byte[] content, MimeType mimeType){
+    public static void buildFile(OutputStream outputstream, String fileName, byte[] content, MimeType mimeType){
         ExceptionUtil.nullExeption(outputstream);
         ExceptionUtil.nullExeption(fileName);
         MultiPartUtil.buildHeader(outputstream,"FileName");
@@ -24,5 +24,14 @@ public class MultiPart {
         MultiPartUtil.buildContent(outputstream,content);
         MultiPartUtil.buildEnd(outputstream);
     }
+    public static void buildBitmap(OutputStream outputstream,int bitmapSize, byte[] content, MimeType mimeType){
+        ExceptionUtil.nullExeption(outputstream);
+        MultiPartUtil.buildHeader(outputstream,"BitmapSize");
+        MultiPartUtil.buildContent(outputstream,(bitmapSize+"").getBytes());
+        MultiPartUtil.buildHeader(outputstream,"Bitmap",mimeType.getValue());
+        MultiPartUtil.buildContent(outputstream,content);
+        MultiPartUtil.buildEnd(outputstream);
+    }
+
 
 }
